@@ -1,6 +1,7 @@
-import datetime
+
 import time
-from datetime import datetime
+#from datetime import datetime
+import datetime
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
@@ -14,6 +15,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 
 def process_payment(request):
+    currentTime = datetime.datetime.now()
     global payor, payee
     if request.method == 'POST':
 
@@ -25,8 +27,10 @@ def process_payment(request):
             z = decimal.Decimal(form.cleaned_data['amount'])
             PaymentDateTime = form.cleaned_data['split_date_time_field']
             if PaymentDateTime:
-                now = datetime.now()
-                sec = (PaymentDateTime.timestamp() - now.timestamp())
+
+                #PaymentDateTime = datetime.strptime(PaymentDateTime, "%Y-%m-%d %H:%M:%S")
+                sec = (PaymentDateTime.timestamp() - currentTime.timestamp())
+                
                 time.sleep(sec)
                 if customer.objects.filter(name=x).exists() and customer.objects.filter(name=y).exists():
                     payor = customer.objects.select_for_update().get(name=x)
