@@ -1,5 +1,3 @@
-import datetime
-
 from django import forms
 
 
@@ -10,15 +8,15 @@ class Payment(forms.Form):
     # day = forms.DateField(initial=datetime.date.today)
     # time = forms.TimeField()
     split_date_time_field = forms.SplitDateTimeField(
-        label='Payment Date and Time(Optional) Format: date-%Y-%m-%d  time:%H:%M:%S'
+        label_suffix=" : "
         ,
-        label_suffix=" : ", required=False,
+        label='Payment Date and Time(Optional) Format: date-%Y-%m-%d  time:%H:%M:%S', required=False,
         disabled=False, input_date_formats=["%Y-%m-%d"],
         input_time_formats=["%H:%M:%S"],
         widget=forms.SplitDateTimeWidget(attrs={'class': 'form-control',
                                                 'placeholder': 'Date and Time'}),
 
-        )
+    )
 
 
 class PaymentHistory(forms.Form):

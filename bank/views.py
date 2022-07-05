@@ -1,20 +1,15 @@
-import time
 import datetime
-import multiprocessing
-
+from background_task import background
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from .forms import Payment, PaymentHistory
 from .models import customer, paymentHistory
-from django.db.models import F
 import decimal
 from django.db import transaction
 from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist
 
 
 def payment_history(request):
-
     if request.method == 'POST':
         form = PaymentHistory(request.POST)
         if form.is_valid():
@@ -42,33 +37,16 @@ def process_payment(request):
             PaymentDateTime = form.cleaned_data['split_date_time_field']
             if PaymentDateTime:
 
-                # PaymentDateTime = datetime.strptime(PaymentDateTime, "%Y-%m-%d %H:%M:%S")
                 sec = (PaymentDateTime.timestamp() - currentTime.timestamp())
 
-                time.sleep(sec)
-                if customer.objects.filter(name=x).exists() and customer.objects.filter(name=y).exists():
-                    payor = customer.objects.select_for_update().get(name=x)
-                    payee = customer.objects.select_for_update().get(name=y)
+                if not customer.objects.filter(phoneNo=x).exists() or not customer.objects.filter(phoneNo=y).exists():
 
-                    with transaction.atomic():
-                        payor.balance -= z
-                        payor.save()
-
-                        payee.balance += z
-                        payee.save()
-
-                        saveHistory = paymentHistory()
-                        saveHistory.senderPhoneNo = x
-                        saveHistory.receiverPhoneNo = y
-                        saveHistory.amount = z
-                        saveHistory.save()
-                        # customer.objects.filter(name=x).update(balance=F('balance') - z)
-                        # customer.objects.filter(name=y).update(balance=F('balance') + z)
-                        messages.success(request, 'Congratulations, Transaction Successful...!')  # ignored
-
-                        return HttpResponseRedirect('/')
-                else:
                     messages.warning(request, 'Invalid Information, Transaction Failed...!')  # recorded
+                    return HttpResponseRedirect('/')
+                else:
+                    messages.success(request, f'Congratulations, Your Payment Have Been Scheduled On : {PaymentDateTime}') # ignored
+
+                    notify_user(payor_no=x, payee_no=y, amount=str(z), schedule=round(sec))
                     return HttpResponseRedirect('/')
             else:
 
@@ -89,8 +67,6 @@ def process_payment(request):
                         saveHistory.amount = z
                         saveHistory.save()
 
-                        # customer.objects.filter(name=x).update(balance=F('balance') - z)
-                        # customer.objects.filter(name=y).update(balance=F('balance') + z)
                         messages.success(request, 'Congratulations, Transaction Successful...!')  # ignored
 
                         return HttpResponseRedirect('/')
@@ -100,9 +76,23 @@ def process_payment(request):
         else:
             print("Invalid")
 
-        # customerData = customer.objects.all()
-
     else:
         form = Payment()
 
     return render(request, 'index.html', {'form': form})
+
+
+@background()
+def notify_user(payor_no, payee_no, amount):
+    payor = customer.objects.select_for_update().get(phoneNo=payor_no)
+    payee = customer.objects.select_for_update().get(phoneNo=payee_no)
+    with transaction.atomic():
+        payor.balance -= int(amount)
+        payor.save()
+        payee.balance += int(amount)
+        payee.save()
+        saveHistory = paymentHistory()
+        saveHistory.senderPhoneNo = payor_no
+        saveHistory.receiverPhoneNo = payee_no
+        saveHistory.amount = int(amount)
+        saveHistory.save()
