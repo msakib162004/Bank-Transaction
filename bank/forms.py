@@ -5,8 +5,6 @@ class Payment(forms.Form):
     payor_no = forms.CharField(max_length=30, error_messages={'required': "This field is required."})
     payee_no = forms.CharField(max_length=30, error_messages={'required': "This field is required."})
     amount = forms.CharField(max_length=30, error_messages={'required': "This field is required."})
-    # day = forms.DateField(initial=datetime.date.today)
-    # time = forms.TimeField()
     split_date_time_field = forms.SplitDateTimeField(
         label_suffix=" : "
         ,
@@ -19,5 +17,5 @@ class Payment(forms.Form):
     )
 
 
-class PaymentHistory(forms.Form):
+class PaymentHistoryForm(forms.Form):
     account_phone_no = forms.CharField(max_length=11, error_messages={'required': "This field is required."})

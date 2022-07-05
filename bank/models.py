@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class customer(models.Model):
+class Customer(models.Model):
     name = models.CharField(max_length=50)
     balance = models.DecimalField(max_digits=5, decimal_places=2)
     phoneNo = models.CharField(max_length=11)
@@ -12,7 +12,8 @@ class customer(models.Model):
         return self.name
 
 
-class paymentHistory(models.Model):
+class PaymentHistory(models.Model):
     senderPhoneNo = models.CharField(max_length=11)
     receiverPhoneNo = models.CharField(max_length=11)
     amount = models.DecimalField(max_digits=5, decimal_places=2)
+    dateTime = models.DateTimeField(auto_now=True)
