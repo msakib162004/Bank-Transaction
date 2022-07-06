@@ -21,3 +21,11 @@ Run instructions:
 	In first terminal run: python manage.py runserver
 	In second terminal run: python manage.py process_tasks
 
+
+Database:
+
+	There three table.
+	
+	1. Customer
+	2. Payment Details
+	3. Background Task
