@@ -1,5 +1,11 @@
 # Bank-Transaction
 
+Features:
+
+	1. Instant Payment
+	2. Scheduled Payment
+
+
 Setup:
 
 Create a virtual environment using requirments.txt
