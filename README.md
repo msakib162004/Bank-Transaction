@@ -35,3 +35,12 @@ Database:
 	1. Customer
 	2. Payment Details
 	3. Background Task
+	
+
+Payment instructions:
+
+	1. Payor phone no
+	2. Payee phone no
+	3. Amount
+	4. Date and Time(Optational)
+
